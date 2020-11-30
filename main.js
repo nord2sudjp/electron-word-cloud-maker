@@ -95,4 +95,5 @@ ipcMain.on("wordcloud:create", (e, options) => {
 
   var data = fs.readFileSync(slash(options.txtPath));
   log.info("Synchronous read: " + data.toString().slice(0, 50));
+  mainWindow.webContents.send("wordcloud:done", data.toString());
 });

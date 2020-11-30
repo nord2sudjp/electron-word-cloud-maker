@@ -60,7 +60,8 @@
         ipcRenderer.send("wordcloud:create", { txtPath });
       });
 
-      ipcRenderer.on("wordcloud:done", () => {
+      ipcRenderer.on("wordcloud:done", (event, arg) => {
+        console.log("wordcloud.done:", arg);
         M.toast({ html: `Word cloud created` });
       });
 
