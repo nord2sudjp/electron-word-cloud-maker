@@ -55,13 +55,22 @@
         console.log("submit:", text_contents);
 
         const txtPath = text_contents.files[0].path;
-        console.log("path and quality:", txtPath);
+        console.log("file path:", txtPath);
 
         ipcRenderer.send("wordcloud:create", { txtPath });
       });
 
       ipcRenderer.on("wordcloud:done", (event, arg) => {
-        console.log("wordcloud.done:", arg);
+        console.log("wordcloud.done:", arg.slice(1, 20));
+        console.log("wordcloud.done:before replace:", myWords);
+        myWords = arg.match(/\S+/g);
+        //myWords = ["Love", "Peace"];
+
+        console.log("wordcloud.done:after replace:", myWords.slice(1, 10));
+
+        svg.selectAll("*").remove();
+        crt_layout();
+
         M.toast({ html: `Word cloud created` });
       });
 
@@ -70,26 +79,7 @@
       });
     </script>
     <script>
-      var myWords = [
-        "Hello",
-        "Everybody",
-        "How",
-        "Are",
-        "You",
-        "Today",
-        "It",
-        "Is",
-        "A",
-        "Lovely",
-        "Day",
-        "I",
-        "Love",
-        "Coding",
-        "In",
-        "My",
-        "Van",
-        "Mate",
-      ];
+      var myWords = ["Hello"];
     </script>
     <script>
       // List of words
@@ -103,24 +93,30 @@
       var svg = d3
         .select("#my_dataviz")
         .append("svg")
+        .attr("class", "wordcloud")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      var layout;
+
+      crt_layout();
 
       // Constructs a new cloud layout instance. It run an algorithm to find the position of words that suits your requirements
-      var layout = d3.layout
-        .cloud()
-        .size([width, height])
-        .words(
-          myWords.map(function (d) {
-            return { text: d };
-          })
-        )
-        .padding(10)
-        .fontSize(60)
-        .on("end", draw);
-      layout.start();
+      function crt_layout() {
+        layout = d3.layout
+          .cloud()
+          .size([width, height])
+          .words(
+            myWords.map(function (d) {
+              return { text: d };
+            })
+          )
+          .padding(10)
+          .fontSize(60)
+          .on("end", draw);
+        layout.start();
+      }
 
       // This function takes the output of 'layout' above and draw the words
       // Better not to touch it. To change parameters, play with the 'layout' variable above
