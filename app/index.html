@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" value="default-src 'self';
+    content="script-src 'self' 'unsafe-inline' d3js.org cdn.jsdelivr.net" />
+    <link rel="stylesheet" href="css/all.min.css" />
+    <link rel="stylesheet" href="css/materialize.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <!-- d3.js -->
+    <script src="https://d3js.org/d3.v4.js"></script>
+
+    <!-- d3-cloud -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.min.js"></script>
+    <title>WordCloud</title>
+  </head>
+  <body>
+    <div class="container center-align">
+      <h3><i class="fas fa-images"></i>Word Cloud</h3>
+      <p>Choose an text to make word cloud</p>
+      <form id="text-form">
+        <div class="file-field input-field">
+          <div class="btn">
+            <span>Browse</span><input type="file" id="text_contents" />
+          </div>
+          <div class="file-path-wrapper">
+            <input
+              type="text"
+              class="file-path validate"
+              placeholder="Upload File"
+            />
+          </div>
+        </div>
+
+        <input type="submit" value="Wordcloud" class="btn black" />
+      </form>
+    </div>
+    <div class="container center-align">
+      <div id="my_dataviz"></div>
+    </div>
+    <script src="js/materialize.min.js"></script>
+
+    <script>
+      const path = require("path");
+      const os = require("os");
+      const { ipcRenderer } = require("electron");
+
+      const form = document.getElementById("text-form");
+      const text_contents = document.getElementById("text_contents");
+
+      // onsubmit
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        console.log("submit:", text_contents);
+
+        const txtPath = text_contents.files[0].path;
+        console.log("path and quality:", txtPath);
+
+        ipcRenderer.send("wordcloud:create", { txtPath });
+      });
+
+      ipcRenderer.on("wordcloud:done", () => {
+        M.toast({ html: `Word cloud created` });
+      });
+
+      ipcRenderer.on("wordcloud:err", () => {
+        M.toast({ html: `Something goes wrong` });
+      });
+    </script>
+    <script>
+      var myWords = [
+        "Hello",
+        "Everybody",
+        "How",
+        "Are",
+        "You",
+        "Today",
+        "It",
+        "Is",
+        "A",
+        "Lovely",
+        "Day",
+        "I",
+        "Love",
+        "Coding",
+        "In",
+        "My",
+        "Van",
+        "Mate",
+      ];
+    </script>
+    <script>
+      // List of words
+
+      // set the dimensions and margins of the graph
+      var margin = { top: 10, right: 10, bottom: 10, left: 10 },
+        width = 450 - margin.left - margin.right,
+        height = 450 - margin.top - margin.bottom;
+
+      // append the svg object to the body of the page
+      var svg = d3
+        .select("#my_dataviz")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      // Constructs a new cloud layout instance. It run an algorithm to find the position of words that suits your requirements
+      var layout = d3.layout
+        .cloud()
+        .size([width, height])
+        .words(
+          myWords.map(function (d) {
+            return { text: d };
+          })
+        )
+        .padding(10)
+        .fontSize(60)
+        .on("end", draw);
+      layout.start();
+
+      // This function takes the output of 'layout' above and draw the words
+      // Better not to touch it. To change parameters, play with the 'layout' variable above
+      function draw(words) {
+        svg
+          .append("g")
+          .attr(
+            "transform",
+            "translate(" +
+              layout.size()[0] / 2 +
+              "," +
+              layout.size()[1] / 2 +
+              ")"
+          )
+          .selectAll("text")
+          .data(words)
+          .enter()
+          .append("text")
+          .style("font-size", function (d) {
+            return d.size + "px";
+          })
+          .attr("text-anchor", "middle")
+          .attr("transform", function (d) {
+            return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+          })
+          .text(function (d) {
+            return d.text;
+          });
+      }
+    </script>
+  </body>
+</html>
