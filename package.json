@@ -12,8 +12,9 @@
   "license": "ISC",
   "dependencies": {
     "electron": "^11.0.3",
-    "nodemon": "^2.0.6",
     "electron-log": "^4.3.0",
+    "n-readlines": "^1.0.1",
+    "nodemon": "^2.0.6",
     "slash": "^3.0.0"
   }
 }

@@ -4,6 +4,7 @@ const { app, BrowserWindow, Menu, ipcMain, shell } = require("electron");
 const log = require("electron-log");
 const slash = require("slash");
 const fs = require("fs");
+const lineByLine = require("n-readlines");
 
 process.env.NODE_ENV = "development";
 const isDev = process.env.NODE_ENV !== "production" ? true : false;
@@ -95,5 +96,52 @@ ipcMain.on("wordcloud:create", (e, options) => {
 
   var data = fs.readFileSync(slash(options.txtPath));
   log.info("Synchronous read: " + data.toString().slice(0, 50));
+
+  wc = sort_wmap(wordcount(data.toString()));
+
+  wc = Object.entries(wc).slice(0, 100);
+
+  log.info("ipcMain.on.wordcloud.create:after wordcount:" + JSON.stringify(wc));
+
   mainWindow.webContents.send("wordcloud:done", data.toString());
 });
+
+function wordcount(data) {
+  var words = data.split(/\s+/);
+
+  // create map for word counts
+  var wmap = {};
+  words.forEach(function (key) {
+    if (wmap.hasOwnProperty(key)) {
+      wmap[key]++;
+    } else {
+      wmap[key] = 1;
+    }
+  });
+  log.info("wordcount:" + Object.keys(wmap).length);
+
+  return wmap;
+}
+
+function sort_wmap(wmap) {
+  // sort by count in descending order
+  var smap = [];
+  smap = Object.keys(wmap).map(function (key) {
+    return {
+      word: key,
+      count: wmap[key],
+    };
+  });
+
+  smap.sort(function (a, b) {
+    //return a.total - b.total;
+    return a.count < b.count ? 1 : -1;
+  });
+  log.info(
+    "sort_wmap:" + Object.keys(smap).length,
+    Object.keys(smap).slice(1, 10)
+  );
+  log.info(smap);
+
+  return smap;
+}
