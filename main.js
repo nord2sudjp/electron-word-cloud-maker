@@ -97,11 +97,14 @@ ipcMain.on("wordcloud:create", (e, options) => {
   var data = fs.readFileSync(slash(options.txtPath));
   log.info("Synchronous read: " + data.toString().slice(0, 50));
 
-  wc = sort_wmap(wordcount(data.toString()));
-
-  wc = Object.entries(wc).slice(0, 100);
-
-  log.info("ipcMain.on.wordcloud.create:after wordcount:" + JSON.stringify(wc));
+  //wc = sort_wmap(wordcount(data.toString()));
+  //wc = Object.entries(wc).slice(0, 100);
+  //log.info(wc);
+  wc = wordcount(data.toString());
+  wc = make_aaray(wc);
+  wc = sort_wmap(wc);
+  log.info(wc.slice(0, 10));
+  mainWindow.webContents.send("wordcloud:counted", wc.slice(0, 10));
 
   mainWindow.webContents.send("wordcloud:done", data.toString());
 });
@@ -119,29 +122,48 @@ function wordcount(data) {
     }
   });
   log.info("wordcount:" + Object.keys(wmap).length);
+  log.info("wordcount:" + dic_slice(wmap, 1, 10));
 
   return wmap;
 }
 
-function sort_wmap(wmap) {
+function make_aaray(wmap) {
   // sort by count in descending order
   var smap = [];
-  smap = Object.keys(wmap).map(function (key) {
-    return {
-      word: key,
-      count: wmap[key],
-    };
-  });
+  for (var key in wmap) {
+    // Use this function to iterate over each item in the list
+    t = { word: key, count: wmap[key] };
+    smap.push(t);
+  }
+  // smap = Object.keys(wmap).map(function (key) {
+  //   return {
+  //     word: key,
+  //     count: wmap[key],
+  //   };
+  // });
 
+  return smap;
+}
+
+function sort_wmap(smap) {
   smap.sort(function (a, b) {
     //return a.total - b.total;
     return a.count < b.count ? 1 : -1;
   });
-  log.info(
-    "sort_wmap:" + Object.keys(smap).length,
-    Object.keys(smap).slice(1, 10)
-  );
-  log.info(smap);
+  log.info("sort_wmap:" + Object.keys(smap).length, smap.slice(1, 10));
+  log.info(smap.slice(0, 10));
 
   return smap;
+}
+
+function dic_slice(obj, start, end) {
+  var sliced = {};
+  var i = 0;
+  for (var k in obj) {
+    if (i >= start && i < end) sliced[k] = obj[k];
+
+    i++;
+  }
+
+  return sliced;
 }

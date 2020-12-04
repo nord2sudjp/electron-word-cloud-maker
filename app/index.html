@@ -37,6 +37,8 @@
       </form>
     </div>
     <div class="container center-align">
+      <div><table id="word_count_list"></table></div>
+
       <div id="my_dataviz"></div>
     </div>
     <script src="js/materialize.min.js"></script>
@@ -59,7 +61,23 @@
 
         ipcRenderer.send("wordcloud:create", { txtPath });
       });
+      ipcRenderer.on("wordcloud:counted", (event, arg) => {
+        console.log("wordcloud:counted:called");
+        const table = document.getElementById("word_count_list");
+        for (var key in arg) {
+          var tr = document.createElement("tr");
+          console.log(arg[key].word, arg[key].count);
 
+          for (var i in arg[key]) {
+            var td = document.createElement("td");
+            td.innerHTML = arg[key][i];
+            tr.appendChild(td);
+            td = document.createElement("td");
+            tr.append;
+          }
+          table.appendChild(tr);
+        }
+      });
       ipcRenderer.on("wordcloud:done", (event, arg) => {
         console.log("wordcloud.done:", arg.slice(1, 20));
         console.log("wordcloud.done:before replace:", myWords);
