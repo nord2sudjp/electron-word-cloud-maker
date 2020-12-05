@@ -130,8 +130,9 @@
               return { text: d };
             })
           )
-          .padding(10)
-          .fontSize(60)
+          .padding(5)
+          .rotate(-45)
+          .fontSize(20)
           .on("end", draw);
         layout.start();
       }
@@ -153,9 +154,8 @@
           .data(words)
           .enter()
           .append("text")
-          .style("font-size", function (d) {
-            return d.size + "px";
-          })
+          .style("font-size", 20)
+          .style("fill", "#69b3a2")
           .attr("text-anchor", "middle")
           .attr("transform", function (d) {
             return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
