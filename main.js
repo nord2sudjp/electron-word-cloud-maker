@@ -103,9 +103,8 @@ ipcMain.on("wordcloud:create", (e, options) => {
   wc = wordcount(data.toString());
   wc = make_aaray(wc);
   wc = sort_wmap(wc);
-  log.info(wc.slice(0, 10));
+  log.info("ipcMain.on.wordcloud.create:result of wc-", wc.slice(0, 10));
   mainWindow.webContents.send("wordcloud:counted", wc.slice(0, 10));
-
   mainWindow.webContents.send("wordcloud:done", data.toString());
 });
 
@@ -122,8 +121,6 @@ function wordcount(data) {
     }
   });
   log.info("wordcount:" + Object.keys(wmap).length);
-  log.info("wordcount:" + dic_slice(wmap, 1, 10));
-
   return wmap;
 }
 
@@ -151,8 +148,6 @@ function sort_wmap(smap) {
     return a.count < b.count ? 1 : -1;
   });
   log.info("sort_wmap:" + Object.keys(smap).length, smap.slice(1, 10));
-  log.info(smap.slice(0, 10));
-
   return smap;
 }
 
