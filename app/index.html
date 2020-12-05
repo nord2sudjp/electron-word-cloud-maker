@@ -80,7 +80,7 @@
       });
       ipcRenderer.on("wordcloud:done", (event, arg) => {
         console.log("wordcloud.done:", arg.slice(1, 10));
-        myWords = arg;
+        myWords = arg.slice(1, 100);
 
         // myWords = arg.match(/\S+/g); // サーバー側で処理 //スペースとマッチしたら配列にする。
         //myWords = ["Love", "Peace"];
@@ -129,7 +129,7 @@
             myWords.map(function (d) {
               console.log(d.word);
 
-              return { text: d.word, size: d.count * 5 };
+              return { text: d.word, size: d.count * 7 };
             })
           )
           .padding(5) //space between words
@@ -137,7 +137,7 @@
             return ~~(Math.random() * 2) * 90;
           })
           .fontSize(function (d) {
-            return 20;
+            return d.size;
           }) // font size of words
           .on("end", draw);
         layout.start();
@@ -160,7 +160,7 @@
           .data(words)
           .enter()
           .append("text")
-          .style("font-size", 20)
+          .style("font-size", (d) => d.size)
           .style("fill", "#69b3a2")
           .attr("text-anchor", "middle")
           .attr("transform", function (d) {
