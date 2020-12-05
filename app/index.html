@@ -81,14 +81,6 @@
       ipcRenderer.on("wordcloud:done", (event, arg) => {
         console.log("wordcloud.done:", arg.slice(1, 10));
         myWords = arg;
-        myWords = [
-          { word: "Running", size: "10" },
-          { word: "Surfing", size: "20" },
-          { word: "Climbing", size: "50" },
-          { word: "Kiting", size: "30" },
-          { word: "Sailing", size: "20" },
-          { word: "Snowboarding", size: "60" },
-        ];
 
         // myWords = arg.match(/\S+/g); // サーバー側で処理 //スペースとマッチしたら配列にする。
         //myWords = ["Love", "Peace"];
@@ -110,7 +102,6 @@
     </script>
     <script>
       // List of words
-
       // set the dimensions and margins of the graph
       var margin = { top: 10, right: 10, bottom: 10, left: 10 },
         width = 450 - margin.left - margin.right,
@@ -136,7 +127,9 @@
           .size([width, height])
           .words(
             myWords.map(function (d) {
-              return { text: d.word, size: d.size };
+              console.log(d.word);
+
+              return { text: d.word, size: d.count * 5 };
             })
           )
           .padding(5) //space between words
@@ -144,7 +137,7 @@
             return ~~(Math.random() * 2) * 90;
           })
           .fontSize(function (d) {
-            return d.size;
+            return 20;
           }) // font size of words
           .on("end", draw);
         layout.start();

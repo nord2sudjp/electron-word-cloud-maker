@@ -107,7 +107,7 @@ ipcMain.on("wordcloud:create", (e, options) => {
   mainWindow.webContents.send("wordcloud:counted", wc.slice(0, 10));
 
   wa = data.toString().match(/\S+/g);
-  mainWindow.webContents.send("wordcloud:done", wa);
+  mainWindow.webContents.send("wordcloud:done", wc);
 });
 
 function wordcount(data) {
