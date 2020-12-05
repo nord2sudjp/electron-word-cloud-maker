@@ -79,9 +79,9 @@
         }
       });
       ipcRenderer.on("wordcloud:done", (event, arg) => {
-        console.log("wordcloud.done:", arg.slice(1, 20));
-        console.log("wordcloud.done:before replace:", myWords);
-        myWords = arg.match(/\S+/g);
+        console.log("wordcloud.done:", arg.slice(1, 10));
+        myWords = arg;
+        // myWords = arg.match(/\S+/g); // サーバー側で処理 //スペースとマッチしたら配列にする。
         //myWords = ["Love", "Peace"];
 
         console.log("wordcloud.done:after replace:", myWords.slice(1, 10));
